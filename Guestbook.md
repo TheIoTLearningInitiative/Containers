@@ -367,6 +367,147 @@ user@workstation:~/bitnami/intel-training-1/guestbook$ echo "$(minikube ip):$(ku
 
 Go to http://127.0.0.1:3000/
 
+## Ingress Controller
+
+> [Documentation](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-controllers)
+
+```
+user@workstation:~/bitnami/intel-training-1/guestbook$ sudo cat /etc/hosts
+[sudo] password for user: 
+127.0.0.1       localhost
+127.0.1.1       workstation
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+user@workstation:~/bitnami/intel-training-1/guestbook$ 
+```
+
+- [Ingress Nginx Annotations](https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md)
+
+```
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: guestbook-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: cookie
+spec:
+  rules:
+  - host: guestbook-site.com
+    http:
+      paths:
+      - path: "/"
+        backend:
+          serviceName: frontend
+          servicePort: 80
+```
+
+```
+user@workstation:~/bitnami/intel-training-1/guestbook$ kubectl get deployments --all-namespaces
+NAMESPACE     NAME                                DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+default       foppish-jackal-redis-slave          1         1         1            1           16h
+default       guestbook                           3         3         3            3           2h
+default       nginx                               4         4         4            4           3h
+default       redis-master                        1         1         1            1           2h
+default       redis-slave                         3         3         3            3           2h
+kube-system   kube-dns                            1         1         1            1           16h
+kube-system   kubernetes-dashboard                1         1         1            1           16h
+kube-system   tiller-deploy                       1         1         1            1           16h
+kubeapps      kubeapps                            1         1         1            1           16h
+kubeapps      kubeapps-apprepository-controller   1         1         1            1           16h
+kubeapps      kubeapps-chartsvc                   1         1         1            1           16h
+kubeapps      kubeapps-dashboard                  1         1         1            1           16h
+kubeapps      kubeapps-mongodb                    1         1         1            1           16h
+kubeapps      kubeapps-tiller-proxy               1         1         1            1           16h
+user@workstation:~/bitnami/intel-training-1/guestbook$ 
+```
+
+```
+user@workstation:~/bitnami/intel-training-1/guestbook$ kubectl get deployments -n kube-system
+NAME                   DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+kube-dns               1         1         1            1           16h
+kubernetes-dashboard   1         1         1            1           16h
+tiller-deploy          1         1         1            1           16h
+user@workstation:~/bitnami/intel-training-1/guestbook$ 
+```
+
+```
+#########
+# Ingress
+#########
+## Installation
+minikube addons list
+minikube addons enable ingress
+kubectl get deployments -n kube-system
+kubectl get deployment nginx-ingress-controller -n kube-system -o yaml
+## Use
+kubectl create -f resources/ingress.yaml
+echo "$(minikube ip)   foo.bar.com" | sudo tee -a /etc/hosts
+curl http://foo.bar.com
+```
+
+```
+user@workstation:~/bitnami/intel-training-1/guestbook$ minikube addons list
+- addon-manager: enabled
+- coredns: disabled
+- dashboard: enabled
+- default-storageclass: enabled
+- efk: disabled
+- freshpod: disabled
+- heapster: disabled
+- ingress: disabled
+- kube-dns: enabled
+- metrics-server: disabled
+- nvidia-driver-installer: disabled
+- nvidia-gpu-device-plugin: disabled
+- registry: disabled
+- registry-creds: disabled
+- storage-provisioner: enabled
+user@workstation:~/bitnami/intel-training-1/guestbook$ minikube addons enable ingress
+ingress was successfully enabled
+user@workstation:~/bitnami/intel-training-1/guestbook$ 
+```
+
+```
+user@workstation:~/bitnami/intel-training-1/guestbook$ kubectl get deployments -n kube-system
+NAME                       DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+default-http-backend       1         1         1            0           14s
+kube-dns                   1         1         1            1           16h
+kubernetes-dashboard       1         1         1            1           16h
+nginx-ingress-controller   1         1         1            0           14s
+tiller-deploy              1         1         1            1           16h
+user@workstation:~/bitnami/intel-training-1/guestbook$ 
+```
+
+```
+user@workstation:~/bitnami/intel-training-1/guestbook$ kubectl get deployment nginx-ingress-controller -n kube-system -o yaml
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl create -f resources/ingress.yaml
+ingress.extensions/nginx created
+user@workstation:~/bitnami/intel-training-1$ echo "$(minikube ip)   foo.bar.com" | sudo tee -a /etc/hosts
+192.168.99.100   foo.bar.com
+user@workstation:~/bitnami/intel-training-1$ curl http://foo.bar.com
+curl: (7) Failed to connect to foo.bar.com port 80: Connection refused
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ curl http://foo.bar.com
+<html>
+<head><title>503 Service Temporarily Unavailable</title></head>
+<body bgcolor="white">
+<center><h1>503 Service Temporarily Unavailable</h1></center>
+<hr><center>nginx/1.13.12</center>
+</body>
+</html>
+user@workstation:~/bitnami/intel-training-1$ 
+```
+
 ## Part III
 
 ```
@@ -381,4 +522,6 @@ kubectl create -f part-iii/ingress.yaml
 ## Windows Users: https://blog.kowalczyk.info/article/10c/local-dns-modifications-on-windows-etchosts-equivalent.html
 echo "$(minikube ip)   guestbook-site.com" | sudo tee -a /etc/hosts
 ## Acces via browser to guestbook-site.com
+```
+
 ```
