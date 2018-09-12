@@ -67,30 +67,6 @@ redis-slave-55d7485bf7-kk627                 0/1       ContainerCreating   0    
 user@workstation:~/bitnami/intel-training-1/guestbook$ 
 ```
 
-## Part II
-
-> [Documentation](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.10/#service-v1-core)
-
-Services
-
-- ClusterIP
-- NodePort
-- LoadBalancer
-
-```
-# Part II
-
-## Create backend services
-kubectl create -f part-ii/redis-master-service.yaml
-kubectl create -f part-ii/redis-slave-service.yaml
-## Create frontend services
-kubectl create -f part-ii/frontend-service.yaml
-## Get NODE_PORT and access frontend
-curl $(minikube ip):$(kubectl get svc frontend -o jsonpath="{.spec.ports[0].nodePort}")
-## Acces via browser to: 
-echo "$(minikube ip):$(kubectl get svc frontend -o jsonpath="{.spec.ports[0].nodePort}")"
-```
-
 ### Nginx Service
 
 ```
@@ -103,6 +79,22 @@ kubectl delete -f resources/nginx-svc.yaml
 kubectl expose deployment/nginx --port=8080 --name=http --type=NodePort
 kubectl get svc
 curl http://$(minikube ip):$(kubectl get svc nginx -o jsonpath='{.spec.ports[0].nodePort}')
+```
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  selector:
+    app: nginx
 ```
 
 ```
@@ -219,6 +211,161 @@ redis-slave-55d7485bf7-8h7z5                 0/1       CrashLoopBackOff   21    
 redis-slave-55d7485bf7-kk627                 0/1       CrashLoopBackOff   21         1h
 user@workstation:~/bitnami/intel-training-1$ 
 ```
+
+Go to http://192.168.99.100:32514/
+
+### DNS
+
+```
+# DNS
+kubectl create -f resources/busybox.yaml
+kubectl exec -it busybox -- nslookup nginx
+kubectl get svc
+kubectl exec -ti busybox -- wget -O- http://nginx:80
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl create -f resources/busybox.yaml
+pod/busybox created
+user@workstation:~/bitnami/intel-training-1$ kubectl get pods
+NAME                                         READY     STATUS              RESTARTS   AGE
+busybox                                      0/1       ContainerCreating   0          4s
+drone                                        0/1       CrashLoopBackOff    8          45m
+foppish-jackal-redis-master-0                1/1       Running             0          15h
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running             1          15h
+guestbook-bb55b9bcf-5jcwm                    1/1       Running             0          1h
+guestbook-bb55b9bcf-t8h9x                    1/1       Running             0          1h
+guestbook-bb55b9bcf-tnx4g                    1/1       Running             0          1h
+mongo                                        1/1       Running             0          3h
+nginx-5c6cb7bc9f-4chsb                       1/1       Running             0          2h
+nginx-5c6cb7bc9f-fwfcs                       1/1       Running             0          2h
+nginx-5c6cb7bc9f-m2hvb                       1/1       Running             0          2h
+nginx-5c6cb7bc9f-vd7t2                       1/1       Running             0          2h
+redis-master-5d4c55b49d-c7ckn                1/1       Running             0          1h
+redis-slave-55d7485bf7-6z4zw                 0/1       CrashLoopBackOff    22         1h
+redis-slave-55d7485bf7-8h7z5                 0/1       CrashLoopBackOff    22         1h
+redis-slave-55d7485bf7-kk627                 0/1       CrashLoopBackOff    22         1h
+user@workstation:~/bitnami/intel-training-1$ 
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl exec -it busybox -- nslookup http.default.svc.cluster.local
+Server:         10.96.0.10
+Address:        10.96.0.10:53
+
+
+*** Can't find http.default.svc.cluster.local: No answer
+
+user@workstation:~/bitnami/intel-training-1$ kubectl get svc
+NAME                          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+foppish-jackal-redis-master   ClusterIP   10.109.196.105   <none>        6379/TCP         15h
+foppish-jackal-redis-slave    ClusterIP   10.110.149.112   <none>        6379/TCP         15h
+http                          NodePort    10.99.38.41      <none>        8080:32514/TCP   13m
+kubernetes                    ClusterIP   10.96.0.1        <none>        443/TCP          15h
+user@workstation:~/bitnami/intel-training-1$ 
+```
+
+Error!
+
+## Part II
+
+> [Documentation](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.10/#service-v1-core)
+
+### Services
+
+- ClusterIP
+- NodePort
+- LoadBalancer
+
+```
+# Part II
+
+## Create backend services
+kubectl create -f part-ii/redis-master-service.yaml
+kubectl create -f part-ii/redis-slave-service.yaml
+## Create frontend services
+kubectl create -f part-ii/frontend-service.yaml
+## Get NODE_PORT and access frontend
+curl $(minikube ip):$(kubectl get svc frontend -o jsonpath="{.spec.ports[0].nodePort}")
+## Acces via browser to: 
+echo "$(minikube ip):$(kubectl get svc frontend -o jsonpath="{.spec.ports[0].nodePort}")"
+```
+
+```
+user@workstation:~/bitnami/intel-training-1/guestbook$ kubectl create -f part-ii/redis-master-service.yaml
+service/redis-master created
+user@workstation:~/bitnami/intel-training-1/guestbook$ kubectl create -f part-ii/redis-slave-service.yaml
+service/redis-slave created
+user@workstation:~/bitnami/intel-training-1/guestbook$ kubectl create -f part-ii/frontend-service.yaml
+service/frontend created
+user@workstation:~/bitnami/intel-training-1/guestbook$ kubectl get pods
+NAME                                         READY     STATUS             RESTARTS   AGE
+busybox                                      1/1       Running            0          7m
+drone                                        0/1       CrashLoopBackOff   9          52m
+foppish-jackal-redis-master-0                1/1       Running            0          15h
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running            1          15h
+guestbook-bb55b9bcf-5jcwm                    1/1       Running            0          1h
+guestbook-bb55b9bcf-t8h9x                    1/1       Running            0          1h
+guestbook-bb55b9bcf-tnx4g                    1/1       Running            0          1h
+mongo                                        1/1       Running            0          3h
+nginx-5c6cb7bc9f-4chsb                       1/1       Running            0          2h
+nginx-5c6cb7bc9f-fwfcs                       1/1       Running            0          2h
+nginx-5c6cb7bc9f-m2hvb                       1/1       Running            0          2h
+nginx-5c6cb7bc9f-vd7t2                       1/1       Running            0          2h
+redis-master-5d4c55b49d-c7ckn                1/1       Running            0          1h
+redis-slave-55d7485bf7-6z4zw                 0/1       CrashLoopBackOff   23         1h
+redis-slave-55d7485bf7-8h7z5                 0/1       CrashLoopBackOff   23         1h
+redis-slave-55d7485bf7-kk627                 1/1       Running            24         1h
+user@workstation:~/bitnami/intel-training-1/guestbook$ 
+```
+
+```
+user@workstation:~/bitnami/intel-training-1/guestbook$ curl $(minikube ip):$(kubectl get svc frontend -o jsonpath="{.spec.ports[0].nodePort}")
+```
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <link href="style.css" rel="stylesheet">
+    <title>Guestbook</title>
+  </head>
+  <body>
+    <div id="header">
+      <h1>Guestbook</h1>
+    </div>
+
+    <div id="guestbook-entries">
+      <p>Waiting for database connection...</p>
+    </div>
+
+    <div>
+      <form id="guestbook-form">
+        <input autocomplete="off" id="guestbook-entry-content" type="text">
+        <a href="#" id="guestbook-submit">Submit</a>
+      </form>
+    </div>
+
+    <div>
+      <p><h2 id="guestbook-host-address"></h2></p>
+      <p><a href="env">/env</a>
+      <a href="info">/info</a></p>
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
+```
+
+```
+user@workstation:~/bitnami/intel-training-1/guestbook$ echo "$(minikube ip):$(kubectl get svc frontend -o jsonpath="{.spec.ports[0].nodePort}")"
+192.168.99.100:30920
+```
+
+Go to http://127.0.0.1:3000/
 
 ## Part III
 
