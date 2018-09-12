@@ -227,6 +227,7 @@ spec:
   - image: bitnami/mongodb
     name: mongo
 EOF
+kubectl create -f mongo.yaml
 kubectl delete ns/myns
 ```
 
