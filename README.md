@@ -91,6 +91,8 @@ user@workstation:~$ curl http://127.0.0.1:8080/api
 
 > This page explains how Kubernetes objects are represented in the Kubernetes API, and how you can express them in .yaml format. [Homepage](https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/)
 
+## Kubernetes Deploy
+
 ```
 user@workstation:~$ kubectl get deploy
 NAME                         DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
@@ -121,6 +123,8 @@ mongo                                        1/1       Running   0          2m
 user@workstation:~/bitnami$ 
 ```
 
+## Kubernetes Delete
+
 ```
 user@workstation:~/bitnami$ kubectl get pods
 NAME                                         READY     STATUS             RESTARTS   AGE
@@ -139,3 +143,35 @@ foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running   1          12h
 mongo                                        1/1       Running   0          10m
 user@workstation:~/bitnami$ 
 ```
+
+## Kubernetes Labels
+
+```
+## Labels
+kubectl label pods mongo foo=bar
+kubectl get pods --show-labels
+kubectl get pods -l foo=bar
+kubectl get pods -Lfoo
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl label pods mongo version=0.1
+pod/mongo labeled
+user@workstation:~/bitnami/intel-training-1$ kubectl get pods --show-labels
+NAME                                         READY     STATUS    RESTARTS   AGE       LABELS
+foppish-jackal-redis-master-0                1/1       Running   0          12h       app=redis,chart=redis-3.10.0,controller-revision-hash=foppish-jackal-redis-master-d7bdfc5b6,release=foppish-jackal,role=master,statefulset.kubernetes.io/pod-name=foppish-jackal-redis-master-0
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running   1          12h       app=redis,chart=redis-3.10.0,pod-template-hash=146492639,release=foppish-jackal,role=slave
+mongo                                        1/1       Running   0          15m       version=0.1
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl get pods -l version=0.1
+NAME      READY     STATUS    RESTARTS   AGE
+mongo     1/1       Running   0          16m
+user@workstation:~/bitnami/intel-training-1$ kubectl get pods -L version
+NAME                                         READY     STATUS    RESTARTS   AGE       VERSION
+foppish-jackal-redis-master-0                1/1       Running   0          12h       
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running   1          12h       
+mongo                                        1/1       Running   0          16m       0.1
+```
+
