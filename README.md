@@ -86,3 +86,56 @@ user@workstation:~$ curl http://127.0.0.1:8080/api
   ]
 }user@workstation:~$
 ```
+
+## Kubernetes Objects
+
+> This page explains how Kubernetes objects are represented in the Kubernetes API, and how you can express them in .yaml format. [Homepage](https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/)
+
+```
+user@workstation:~$ kubectl get deploy
+NAME                         DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+foppish-jackal-redis-slave   1         1         1            1           12h
+mongodb                      1         1         1            1           39m
+user@workstation:~$ kubectl delete deploy
+error: resource(s) were provided, but no name, label selector, or --all flag specified
+user@workstation:~$ kubectl delete deploy mongodb
+deployment.extensions "mongodb" deleted
+user@workstation:~$ 
+```
+
+```
+user@workstation:~/bitnami$ mkdir resources
+user@workstation:~/bitnami$ nano resources/mongo-pod.yaml
+user@workstation:~/bitnami$ kubectl create -f resources/mongo-pod.yaml
+pod/mongo created
+user@workstation:~/bitnami$ kubectl get pods
+NAME                                         READY     STATUS              RESTARTS   AGE
+foppish-jackal-redis-master-0                1/1       Running             0          12h
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running             1          12h
+mongo                                        0/1       ContainerCreating   0          4s
+user@workstation:~/bitnami$ kubectl get pods
+NAME                                         READY     STATUS    RESTARTS   AGE
+foppish-jackal-redis-master-0                1/1       Running   0          12h
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running   1          12h
+mongo                                        1/1       Running   0          2m
+user@workstation:~/bitnami$ 
+```
+
+```
+user@workstation:~/bitnami$ kubectl get pods
+NAME                                         READY     STATUS             RESTARTS   AGE
+drone                                        0/1       ImagePullBackOff   0          1m
+foppish-jackal-redis-master-0                1/1       Running            0          12h
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running            1          12h
+mongo                                        1/1       Running            0          8m
+user@workstation:~/bitnami$ kubectl delete deploy drone
+Error from server (NotFound): deployments.extensions "drone" not found
+user@workstation:~/bitnami$ kubectl delete pod drone
+pod "drone" deleted
+user@workstation:~/bitnami$ kubectl get pods
+NAME                                         READY     STATUS    RESTARTS   AGE
+foppish-jackal-redis-master-0                1/1       Running   0          12h
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running   1          12h
+mongo                                        1/1       Running   0          10m
+user@workstation:~/bitnami$ 
+```
