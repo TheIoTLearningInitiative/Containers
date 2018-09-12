@@ -55,10 +55,31 @@ kubectl cluster-info
 kubectl cluster-info --help
 ```
 
+## Kubectl API
+
 ```
 user@workstation:~$ kubectl cluster-info
 Kubernetes master is running at https://192.168.99.100:8443
 KubeDNS is running at https://192.168.99.100:8443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
 
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+```
+
+```
+user@workstation:~$ kubectl proxy --port 8080 &
+[1] 5642
+Starting to serve on 127.0.0.1:8080
+user@workstation:~$ curl http://127.0.0.1:8080/api
+{
+  "kind": "APIVersions",
+  "versions": [
+    "v1"
+  ],
+  "serverAddressByClientCIDRs": [
+    {
+      "clientCIDR": "0.0.0.0/0",
+      "serverAddress": "192.168.99.100:8443"
+    }
+  ]
+}user@workstation:~$
 ```
