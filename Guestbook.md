@@ -525,3 +525,72 @@ echo "$(minikube ip)   guestbook-site.com" | sudo tee -a /etc/hosts
 ```
 
 ```
+user@workstation:~/bitnami/intel-training-1$ kubectl delete svc frontend
+service "frontend" deleted
+user@workstation:~/bitnami/intel-training-1$ cd guestbook/
+user@workstation:~/bitnami/intel-training-1/guestbook$ kubectl create -f part-iii/frontend-service.yaml
+service/frontend created
+user@workstation:~/bitnami/intel-training-1/guestbook$ kubectl create -f part-iii/ingress.yaml
+ingress.extensions/guestbook-ingress created
+user@workstation:~/bitnami/intel-training-1/guestbook$ kubectl get pods
+NAME                                         READY     STATUS    RESTARTS   AGE
+busybox                                      1/1       Running   0          39m
+drone                                        1/1       Running   13         1h
+foppish-jackal-redis-master-0                1/1       Running   0          16h
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running   1          16h
+guestbook-bb55b9bcf-5jcwm                    1/1       Running   0          2h
+guestbook-bb55b9bcf-t8h9x                    1/1       Running   0          2h
+guestbook-bb55b9bcf-tnx4g                    1/1       Running   0          2h
+mongo                                        1/1       Running   0          4h
+nginx-5c6cb7bc9f-4chsb                       1/1       Running   0          3h
+nginx-5c6cb7bc9f-fwfcs                       1/1       Running   0          3h
+nginx-5c6cb7bc9f-m2hvb                       1/1       Running   0          3h
+nginx-5c6cb7bc9f-vd7t2                       1/1       Running   0          3h
+redis-master-5d4c55b49d-c7ckn                1/1       Running   0          2h
+redis-slave-55d7485bf7-6z4zw                 1/1       Running   24         2h
+redis-slave-55d7485bf7-8h7z5                 1/1       Running   24         2h
+redis-slave-55d7485bf7-kk627                 1/1       Running   24         2h
+user@workstation:~/bitnami/intel-training-1/guestbook$ 
+```
+
+```
+user@workstation:~/bitnami/intel-training-1/guestbook$ kubectl get svc
+NAME                          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+foppish-jackal-redis-master   ClusterIP   10.109.196.105   <none>        6379/TCP         16h
+foppish-jackal-redis-slave    ClusterIP   10.110.149.112   <none>        6379/TCP         16h
+frontend                      ClusterIP   10.99.195.240    <none>        80/TCP           31s
+http                          NodePort    10.99.38.41      <none>        8080:32514/TCP   51m
+kubernetes                    ClusterIP   10.96.0.1        <none>        443/TCP          16h
+redis-master                  ClusterIP   10.101.38.81     <none>        6379/TCP         32m
+redis-slave                   ClusterIP   10.109.190.161   <none>        6379/TCP         32m
+user@workstation:~/bitnami/intel-training-1/guestbook$ 
+```
+
+```
+user@workstation:~/bitnami/intel-training-1/guestbook$ sudo cat /etc/hosts
+127.0.0.1       localhost
+127.0.1.1       workstation
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+192.168.99.100   foo.bar.com
+user@workstation:~/bitnami/intel-training-1/guestbook$ echo "$(minikube ip)   guestbook-site.com" | sudo tee -a /etc/hosts
+192.168.99.100   guestbook-site.com
+user@workstation:~/bitnami/intel-training-1/guestbook$ sudo cat /etc/hosts
+127.0.0.1       localhost
+127.0.1.1       workstation
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+192.168.99.100   foo.bar.com
+192.168.99.100   guestbook-site.com
+user@workstation:~/bitnami/intel-training-1/guestbook$ 
+```
