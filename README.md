@@ -91,7 +91,20 @@ user@workstation:~$ curl http://127.0.0.1:8080/api
 
 > This page explains how Kubernetes objects are represented in the Kubernetes API, and how you can express them in .yaml format. [Homepage](https://kubernetes.io/docs/concepts/overview/working-with-objects/kubernetes-objects/)
 
-## Kubernetes Deploy
+## Kubernetes Pods
+
+```
+######
+# Pods
+######
+kubectl create -f resources/mongo-pod.yaml
+kubectl get pods
+## Labels
+kubectl label pods mongo foo=bar
+kubectl get pods --show-labels
+kubectl get pods -l foo=bar
+kubectl get pods -Lfoo
+```
 
 ```
 user@workstation:~$ kubectl get deploy
@@ -236,4 +249,266 @@ nginx-b889q                                  0/1       Terminating   0          
 nginx-j4lf9                                  0/1       Terminating   0          4m
 nginx-pd27d                                  0/1       Terminating   0          5m
 user@workstation:~/bitnami/intel-training-1$ 
+```
+
+## Kubernetes Deployment
+
+> [Documentation](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.10/#replicaset-v1-apps)
+
+```
+#############
+# Deployments
+#############
+kubectl create -f resources/nginx-deployment.yaml
+kubectl scale deployment nginx --replicas=4
+kubectl get pods --watch
+kubectl set image deployment nginx nginx=bitnami/nginx:1.14.0-r49 --all
+kubectl get rs --watch
+kubectl get pods --watch
+kubectl edit deployment nginx
+```
+
+```
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: default
+  labels:
+    app: nginx
+spec:
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: bitnami/nginx
+        name: nginx
+        ports:
+        - name: http
+          containerPort: 8080
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl create -f resources/nginx-deployment.yaml
+deployment.extensions/nginx created
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl scale deployment nginx --replicas=4
+deployment.extensions/nginx scaled
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl get pods
+NAME                                         READY     STATUS              RESTARTS   AGE
+foppish-jackal-redis-master-0                1/1       Running             0          12h
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running             1          12h
+mongo                                        1/1       Running             0          42m
+nginx-858d9d4fff-flj22                       1/1       Running             0          16s
+nginx-858d9d4fff-ltqb4                       1/1       Running             0          5s
+nginx-858d9d4fff-vqkr5                       1/1       Running             0          16s
+nginx-858d9d4fff-wcz76                       0/1       ContainerCreating   0          5s
+user@workstation:~/bitnami/intel-training-1$ 
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl set image deployment nginx nginx=bitnami/nginx:1.14.0-r49 --all
+deployment.extensions/nginx image updated
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl get rs --watch
+NAME                                   DESIRED   CURRENT   READY     AGE
+foppish-jackal-redis-slave-58b8f6b7f   1         1         1         13h
+nginx-858d9d4fff                       3         3         3         2m
+nginx-86f798ff45                       2         2         0         5s
+...
+```
+
+### Kubernetes Deployment Rollback
+
+```
+# Rollbacks
+kubectl run dokuwiki --image=bitnami/dokuwiki --record
+kubectl get deployments dokuwiki -o yaml
+kubectl set image deployment/dokuwiki dokuwiki=bitnami/dokuwiki:09 --all
+kubectl rollout history deployment/dokuwiki
+kubectl get pods
+kubectl rollout undo deployment/dokuwiki
+kubectl rollout history deployment/dokuwiki
+kubectl delete deploy dokuwiki
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl run dokuwiki --image=bitnami/dokuwiki --record
+deployment.apps/dokuwiki created
+user@workstation:~/bitnami/intel-training-1$ kubectl get deployments dokuwiki -o yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    kubernetes.io/change-cause: kubectl run dokuwiki --image=bitnami/dokuwiki --record=true
+  creationTimestamp: 2018-09-12T16:30:16Z
+  generation: 1
+  labels:
+    run: dokuwiki
+  name: dokuwiki
+  namespace: default
+  resourceVersion: "13646"
+  selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/dokuwiki
+  uid: 217532a5-b6a9-11e8-b38d-08002736b0e9
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      run: dokuwiki
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: dokuwiki
+    spec:
+      containers:
+      - image: bitnami/dokuwiki
+        imagePullPolicy: Always
+        name: dokuwiki
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  conditions:
+  - lastTransitionTime: 2018-09-12T16:30:16Z
+    lastUpdateTime: 2018-09-12T16:30:16Z
+    message: Deployment does not have minimum availability.
+    reason: MinimumReplicasUnavailable
+    status: "False"
+    type: Available
+  - lastTransitionTime: 2018-09-12T16:30:16Z
+    lastUpdateTime: 2018-09-12T16:30:16Z
+    message: ReplicaSet "dokuwiki-774cb5b777" is progressing.
+    reason: ReplicaSetUpdated
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  replicas: 1
+  unavailableReplicas: 1
+  updatedReplicas: 1
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl set image deployment/dokuwiki dokuwiki=bitnami/dokuwiki:09 --all
+deployment.extensions/dokuwiki image updated
+user@workstation:~/bitnami/intel-training-1$ kubectl rollout history deployment/dokuwiki
+deployments "dokuwiki"
+REVISION  CHANGE-CAUSE
+1         kubectl run dokuwiki --image=bitnami/dokuwiki --record=true
+2         kubectl run dokuwiki --image=bitnami/dokuwiki --record=true
+
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl get pods
+NAME                                         READY     STATUS         RESTARTS   AGE
+dokuwiki-67c99b5f8-5hp5q                     0/1       ErrImagePull   0          46s
+dokuwiki-774cb5b777-dkb9v                    1/1       Running        0          2m
+foppish-jackal-redis-master-0                1/1       Running        0          13h
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running        1          13h
+mongo                                        1/1       Running        0          56m
+nginx-5c6cb7bc9f-4chsb                       1/1       Running        0          11m
+nginx-5c6cb7bc9f-fwfcs                       1/1       Running        0          11m
+nginx-5c6cb7bc9f-m2hvb                       1/1       Running        0          11m
+nginx-5c6cb7bc9f-vd7t2                       1/1       Running        0          11m
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl rollout undo deployment/dokuwiki
+deployment.extensions/dokuwiki
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl rollout history deployment/dokuwiki
+deployments "dokuwiki"
+REVISION  CHANGE-CAUSE
+2         kubectl run dokuwiki --image=bitnami/dokuwiki --record=true
+3         kubectl run dokuwiki --image=bitnami/dokuwiki --record=true
+
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl set image deployment/dokuwiki dokuwiki=bitnami/dokuwiki:09 --all --record
+deployment.extensions/dokuwiki image updated
+user@workstation:~/bitnami/intel-training-1$ kubectl rollout history deployment/dokuwiki
+deployments "dokuwiki"
+REVISION  CHANGE-CAUSE
+3         kubectl run dokuwiki --image=bitnami/dokuwiki --record=true
+4         kubectl set image deployment/dokuwiki dokuwiki=bitnami/dokuwiki:09 --all=true --record=true
+
+user@workstation:~/bitnami/intel-training-1$ 
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl get pods
+NAME                                         READY     STATUS             RESTARTS   AGE
+dokuwiki-67c99b5f8-vhwng                     0/1       ImagePullBackOff   0          31s
+dokuwiki-774cb5b777-dkb9v                    1/1       Running            0          6m
+dokuwiki09-76cc4f5488-twwdt                  0/1       ImagePullBackOff   0          2m
+foppish-jackal-redis-master-0                1/1       Running            0          13h
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running            1          13h
+mongo                                        1/1       Running            0          59m
+nginx-5c6cb7bc9f-4chsb                       1/1       Running            0          14m
+nginx-5c6cb7bc9f-fwfcs                       1/1       Running            0          14m
+nginx-5c6cb7bc9f-m2hvb                       1/1       Running            0          14m
+nginx-5c6cb7bc9f-vd7t2                       1/1       Running            0          14m
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl rollout undo deployment/dokuwiki
+deployment.extensions/dokuwiki
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl rollout history deployment/dokuwiki
+deployments "dokuwiki"
+REVISION  CHANGE-CAUSE
+4         kubectl set image deployment/dokuwiki dokuwiki=bitnami/dokuwiki:09 --all=true --record=true
+5         kubectl run dokuwiki --image=bitnami/dokuwiki --record=true
+
+user@workstation:~/bitnami/intel-training-1$ 
+```
+
+## Kubernetes Tips and Tricks
+
+```
+$ kubectl config view
+$ kubectl config use-context
+$ kubectl annotate
+$ kubectl label
+$ kubectl create -f ./<DIR>
+$ kubectl create -f <URL>
+$ kubectl edit ...
+$ kubectl proxy ...
+$ kubectl exec ...
+$ kubectl logs ...
+$ kubectl get pods,svc,deployments
+$ kubectl --v=99 ...
+$ kubectl describe ...
 ```
