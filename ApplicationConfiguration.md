@@ -433,7 +433,7 @@ containers:
         claimName: myclaim
 ```
 
-Administrator
+Static Method :: Administrator
 
 ```
 apiVersion: "v1"
@@ -448,6 +448,84 @@ spec:
   gcePersistentDisk: 
     fsType: "ext4" 
     pdName: "pd-disk-1" 
+```
+
+```
+apiVersion: "v1"
+kind: "PersistentVolume"
+metadata:
+  name: "pv0001" 
+  labels: 
+     type: local
+spec:
+  capacity:
+    storage: "10Gi" 
+  accessModes:
+    - "ReadWriteOnce"
+  hostpath: 
+    path: "/mnt/data" 
+```
+
+Static Method :: Developer
+
+```
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: myclaim2
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+selector:
+    matchLabels:
+      type: "gce"
+```
+
+Dynamic Method :: Administrator
+
+```
+  "pv0001" 
+  "30Gi" 
+  "ReadWriteOnce"
+```
+
+```
+  "pv0002" 
+  “gcePersistentDisk”
+  "30Gi" 
+  "ReadWriteOnce"
+```
+
+Dynamic Method :: Developer
+
+```
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi
+```
+
+```
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: myclaim2
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi
+  storageClass: gce-pd
 ```
 
 ### MariaDB with persistence
