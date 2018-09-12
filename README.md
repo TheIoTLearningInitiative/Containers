@@ -23,3 +23,7 @@ sudo apt-get update
 sudo apt-get install -y kubectl
 ```
 
+## Day 1
+
+- [Floobits](https://floobits.com/juan131/intel-training-1/file/WELCOME.md:11)
+
