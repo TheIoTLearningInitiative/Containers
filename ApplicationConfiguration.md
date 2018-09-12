@@ -357,20 +357,7 @@ user@workstation:~/bitnami/intel-training-1$
 kubectl create -f resources/share-volume.yaml
 kubectl logs -f share-volume box
 kubectl delete pod share-volume
-# MariaDB with persistence
-kubectl create -f resources/mariadb-pvc.yaml
-kubectl get pvc
-kubectl create -f resources/mariadb-persitence.yaml
-kubectl exec -it $(kubectl get pods -l app=mariadb -o jsonpath='{.items[0].metadata.name}') bash
-mysql
-show databases;
-create database intel_database;
-kubectl delete pod $(kubectl get pods -l app=mariadb -o jsonpath='{.items[0].metadata.name}')
-kubectl exec -it $(kubectl get pods -l app=mariadb -o jsonpath='{.items[0].metadata.name}') bash
-mysql
-show databases;
-kubectl delete pvc mariadb-data
-kubectl delete deploy mariadb
+...
 ```
 
 ```
@@ -410,4 +397,78 @@ hello buddy!
 ```
 user@workstation:~/bitnami/intel-training-1$ kubectl delete pod share-volume
 pod "share-volume" deleted
+```
+
+### Persistent Volume Claim
+
+Developer
+
+```
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+```
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example
+containers:
+  - image: busybox
+    volumeMounts:
+    - mountPath: /busy
+      name: test
+    name: busy
+  volumes:
+  - name: test
+    persistentVolumeClaim:
+        claimName: myclaim
+```
+
+Administrator
+
+```
+apiVersion: "v1"
+kind: "PersistentVolume"
+metadata:
+  name: "pv0001" 
+spec:
+  capacity:
+    storage: "10Gi" 
+  accessModes:
+    - "ReadWriteOnce"
+  gcePersistentDisk: 
+    fsType: "ext4" 
+    pdName: "pd-disk-1" 
+```
+
+### MariaDB with persistence
+
+```
+#########
+# volumes
+#########
+...
+# MariaDB with persistence
+kubectl create -f resources/mariadb-pvc.yaml
+kubectl get pvc
+kubectl create -f resources/mariadb-persitence.yaml
+kubectl exec -it $(kubectl get pods -l app=mariadb -o jsonpath='{.items[0].metadata.name}') bash
+mysql
+show databases;
+create database intel_database;
+kubectl delete pod $(kubectl get pods -l app=mariadb -o jsonpath='{.items[0].metadata.name}')
+kubectl exec -it $(kubectl get pods -l app=mariadb -o jsonpath='{.items[0].metadata.name}') bash
+mysql
+show databases;
+kubectl delete pvc mariadb-data
+kubectl delete deploy mariadb
 ```
