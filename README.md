@@ -512,3 +512,42 @@ $ kubectl get pods,svc,deployments
 $ kubectl --v=99 ...
 $ kubectl describe ...
 ```
+
+## Kubernetes Services
+
+```
+##########
+# Services
+##########
+kubectl create -f resources/nginx-svc.yaml
+kubectl get svc
+kubectl delete -f resources/nginx-svc.yaml
+kubectl expose deployment/nginx --port=8080 --name=http --type=NodePort
+kubectl get svc
+curl http://$(minikube ip):$(kubectl get svc nginx -o jsonpath='{.spec.ports[0].nodePort}')
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl create -f resources/nginx-svc.yaml
+service/nginx created
+user@workstation:~/bitnami/intel-training-1$ kubectl get svc
+NAME                          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+foppish-jackal-redis-master   ClusterIP   10.109.196.105   <none>        6379/TCP   13h
+foppish-jackal-redis-slave    ClusterIP   10.110.149.112   <none>        6379/TCP   13h
+kubernetes                    ClusterIP   10.96.0.1        <none>        443/TCP    14h
+nginx                         ClusterIP   10.111.72.167    <none>        80/TCP     4s
+user@workstation:~/bitnami/intel-training-1$ kubectl delete -f resources/nginx-svc.yaml
+service "nginx" deleted
+user@workstation:~/bitnami/intel-training-1$ kubectl expose deployment/nginx --port=8080 --name=http --type=NodePort
+service/http exposed
+user@workstation:~/bitnami/intel-training-1$ kubectl get svc
+NAME                          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+foppish-jackal-redis-master   ClusterIP   10.109.196.105   <none>        6379/TCP         13h
+foppish-jackal-redis-slave    ClusterIP   10.110.149.112   <none>        6379/TCP         13h
+http                          NodePort    10.101.117.205   <none>        8080:30522/TCP   4s
+kubernetes                    ClusterIP   10.96.0.1        <none>        443/TCP          14h
+user@workstation:~/bitnami/intel-training-1$ curl http://$(minikube ip):$(kubectl get svc nginx -o jsonpath='{.spec.ports[0].nodePort}')
+Error from server (NotFound): services "nginx" not found
+curl: (7) Failed to connect to 192.168.99.100 port 80: Connection refused
+user@workstation:~/bitnami/intel-training-1$ 
+```
