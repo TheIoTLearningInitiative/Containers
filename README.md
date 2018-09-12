@@ -13,7 +13,7 @@
 
 ## Minikube
 
-> [Homepage](https://github.com/kubernetes/minikube)
+> Minikube is a tool that makes it easy to run Kubernetes locally. Minikube runs a single-node Kubernetes cluster inside a VM on your laptop for users looking to try out Kubernetes or develop with it day-to-day. [Github](https://github.com/kubernetes/minikube)
 
 ```
 minikube start
@@ -24,7 +24,7 @@ minikube addons list
 minukube addons enable dashboard
 ```
 
-Create bitnami/mongodb
+Create bitnami/mongodb via Dashboard
 
 ```
 user@workstation:~$ minikube ssh
@@ -41,4 +41,24 @@ d046557aea6d        k8s.gcr.io/pause-amd64:3.1                 "/pause"         
 effc8021d725        bitnami/mongodb                            "/app-entrypoint.sh …"   12 hours ago        Up 12 hours                             k8s_kubeapps-mongodb_kubeapps-mongodb-649c64c44f-5llqh_kubeapps_115d7f9d-b63b-11e8-b38d-08002736b0e9_0
 89bfa0fce567        k8s.gcr.io/pause-amd64:3.1                 "/pause"                 12 hours ago        Up 12 hours                             k8s_POD_kubeapps-mongodb-649c64c44f-5llqh_kubeapps_115d7f9d-b63b-11e8-b38d-08002736b0e9_0
 $ 
+```
+
+## Kubectl
+
+> The k8s.io/kubectl repo is used to track issues for the kubectl cli distributed with k8s.io/kubernetes. It also contains packages intended for use by client programs. [Github](https://github.com/kubernetes/kubectl)
+
+```
+kubectl config get-contexts
+kubectl config use-context minikube
+kubectl config current-context
+kubectl cluster-info
+kubectl cluster-info --help
+```
+
+```
+user@workstation:~$ kubectl cluster-info
+Kubernetes master is running at https://192.168.99.100:8443
+KubeDNS is running at https://192.168.99.100:8443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 ```
