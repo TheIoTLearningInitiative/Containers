@@ -175,3 +175,51 @@ foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running   1          12h
 mongo                                        1/1       Running   0          16m       0.1
 ```
 
+# Kubernetes ReplicaSet
+
+> [Documentation](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.10/#deployment-v1-apps)
+
+```
+#############
+# ReplicaSets
+#############
+kubectl create -f resources/nginx-rs.yaml
+kubectl scale rs nginx --replicas=5
+kubectl get pods --watch
+# Delete a pod and observe
+kubectl get pods
+kubectl delete pod $(kubectl get pods -l app=nginx -o jsonpath='{.items[0].metadata.name}') && kubectl get pods --watch
+kubectl delete rs nginx
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl create -f resources/nginx-rs.yaml 
+replicaset.extensions/nginx created
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl get pods
+NAME                                         READY     STATUS              RESTARTS   AGE
+foppish-jackal-redis-master-0                1/1       Running             0          12h
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running             1          12h
+mongo                                        1/1       Running             0          26m
+nginx-cm6z5                                  0/1       ContainerCreating   0          7s
+nginx-pd27d                                  0/1       ContainerCreating   0          7s
+user@workstation:~/bitnami/intel-training-1$ 
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl scale rs nginx --replicas=5
+replicaset.extensions/nginx scaled
+user@workstation:~/bitnami/intel-training-1$ kubectl get pods
+NAME                                         READY     STATUS              RESTARTS   AGE
+foppish-jackal-redis-master-0                1/1       Running             0          12h
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running             1          12h
+mongo                                        1/1       Running             0          27m
+nginx-cm6z5                                  1/1       Running             0          1m
+nginx-j4lf9                                  0/1       ContainerCreating   0          6s
+nginx-pd27d                                  1/1       Running             0          1m
+nginx-r55rm                                  1/1       Running             0          6s
+nginx-r856s                                  0/1       ContainerCreating   0          6s
+user@workstation:~/bitnami/intel-training-1$ 
+```
