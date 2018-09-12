@@ -1,6 +1,6 @@
 # Application Configuration
 
-## Envrironment Variables
+## Environment Variables
 
 ```
 ###################
@@ -343,4 +343,71 @@ user@workstation:~/bitnami/intel-training-1$ kubectl get pods -n myns
 NAME      READY     STATUS    RESTARTS   AGE
 mongo     1/1       Running   0          6s
 user@workstation:~/bitnami/intel-training-1$ 
+```
+
+## Persistence
+
+> On-disk files in a Container are ephemeral, which presents some problems for non-trivial applications when running in Containers. First, when a Container crashes, kubelet will restart it, but the files will be lost - the Container starts with a clean state. Second, when running Containers together in a Pod it is often necessary to share files between those Containers. The Kubernetes Volume abstraction solves both of these problems. [Documentation](https://kubernetes.io/docs/concepts/storage/volumes/)
+
+```
+#########
+# volumes
+#########
+# Sharing Volumes
+kubectl create -f resources/share-volume.yaml
+kubectl logs -f share-volume box
+kubectl delete pod share-volume
+# MariaDB with persistence
+kubectl create -f resources/mariadb-pvc.yaml
+kubectl get pvc
+kubectl create -f resources/mariadb-persitence.yaml
+kubectl exec -it $(kubectl get pods -l app=mariadb -o jsonpath='{.items[0].metadata.name}') bash
+mysql
+show databases;
+create database intel_database;
+kubectl delete pod $(kubectl get pods -l app=mariadb -o jsonpath='{.items[0].metadata.name}')
+kubectl exec -it $(kubectl get pods -l app=mariadb -o jsonpath='{.items[0].metadata.name}') bash
+mysql
+show databases;
+kubectl delete pvc mariadb-data
+kubectl delete deploy mariadb
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl create -f resources/share-volume.yaml
+pod/share-volume created
+user@workstation:~/bitnami/intel-training-1$ kubectl get pods
+NAME                                         READY     STATUS              RESTARTS   AGE
+busybox                                      1/1       Running             1          1h
+drone                                        0/1       CrashLoopBackOff    22         2h
+foppish-jackal-redis-master-0                1/1       Running             0          17h
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running             1          17h
+guestbook-bb55b9bcf-5jcwm                    1/1       Running             0          3h
+guestbook-bb55b9bcf-t8h9x                    1/1       Running             0          3h
+guestbook-bb55b9bcf-tnx4g                    1/1       Running             0          3h
+mongo                                        1/1       Running             0          5h
+mysql                                        1/1       Running             0          47m
+nginx-5c6cb7bc9f-4chsb                       1/1       Running             0          4h
+nginx-5c6cb7bc9f-fwfcs                       1/1       Running             0          4h
+nginx-5c6cb7bc9f-m2hvb                       1/1       Running             0          4h
+nginx-5c6cb7bc9f-vd7t2                       1/1       Running             0          4h
+redis-master-5d4c55b49d-c7ckn                1/1       Running             0          3h
+redis-slave-55d7485bf7-6z4zw                 1/1       Running             24         3h
+redis-slave-55d7485bf7-8h7z5                 1/1       Running             24         3h
+redis-slave-55d7485bf7-kk627                 1/1       Running             24         3h
+share-volume                                 0/2       ContainerCreating   0          5s
+user@workstation:~/bitnami/intel-training-1$ 
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl logs -f share-volume box
+hello buddy!
+hello buddy!
+hello buddy!
+hello buddy!
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl delete pod share-volume
+pod "share-volume" deleted
 ```
