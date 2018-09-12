@@ -181,6 +181,13 @@ user@workstation:~/bitnami/intel-training-1$
 ```
 
 ```
+user@workstation:~/bitnami/intel-training-1$ sudo apt install jq
+user@workstation:~/bitnami/intel-training-1$ kubectl get secret mysql -o json | jq -r '.data.password' | base64 --decode
+root
+user@workstation:~/bitnami/intel-training-1$ 
+```
+
+```
 user@workstation:~/bitnami/intel-training-1$ kubectl exec -it mysql -- mysql -h 127.0.0.1 -u root -proot
 mysql: [Warning] Using a password on the command line interface can be insecure.
 Welcome to the MySQL monitor.  Commands end with ; or \g.
@@ -198,9 +205,84 @@ Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 mysql> 
 ```
 
+## Namespaces
+
+> Namespaces are intended to isolate multiple groups/teams and give them access to a set of resources.
+
 ```
-user@workstation:~/bitnami/intel-training-1$ sudo apt install jq
-user@workstation:~/bitnami/intel-training-1$ kubectl get secret mysql -o json | jq -r '.data.password' | base64 --decode
-root
+############
+# namespaces
+############
+kubectl get ns
+kubectl create ns myns
+kubectl get ns/myns -o yaml
+cat << 'EOF' >> mongo.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mongo
+  namespace: myns
+spec:
+  containers:
+  - image: bitnami/mongodb
+    name: mongo
+EOF
+kubectl delete ns/myns
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl get ns
+NAME          STATUS    AGE
+default       Active    16h
+kube-public   Active    16h
+kube-system   Active    16h
+kubeapps      Active    16h
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl create ns myns
+namespace/myns created
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl get ns/myns -o yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: 2018-09-12T20:07:47Z
+  name: myns
+  resourceVersion: "30331"
+  selfLink: /api/v1/namespaces/myns
+  uid: 848333ad-b6c7-11e8-b38d-08002736b0e9
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ cat << 'EOF' >> mongo.yaml
+> apiVersion: v1
+> kind: Pod
+> metadata:
+>   name: mongo
+>   namespace: myns
+> spec:
+>   containers:
+>   - image: bitnami/mongodb
+>     name: mongo
+> EOF
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl get ns
+NAME          STATUS    AGE
+default       Active    16h
+kube-public   Active    16h
+kube-system   Active    16h
+kubeapps      Active    16h
+myns          Active    46s
 user@workstation:~/bitnami/intel-training-1$ 
 ```
+
