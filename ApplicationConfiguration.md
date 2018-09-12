@@ -148,6 +148,7 @@ kubectl delete pod mysql
 kubectl create secret generic mysql --from-literal=password=root
 kubectl create -f resources/mysql-with-secrets.yaml
 kubectl exec -it mysql -- mysql -h 127.0.0.1 -u root -proot
+kubectl get secret mysql -o json | jq -r '.data.password' | base64 --decode
 ```
 
 ```
