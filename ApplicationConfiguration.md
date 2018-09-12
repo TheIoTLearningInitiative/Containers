@@ -286,3 +286,60 @@ myns          Active    46s
 user@workstation:~/bitnami/intel-training-1$ 
 ```
 
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl get pods
+NAME                                         READY     STATUS    RESTARTS   AGE
+busybox                                      1/1       Running   1          1h
+drone                                        1/1       Running   16         1h
+foppish-jackal-redis-master-0                1/1       Running   0          16h
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running   1          16h
+guestbook-bb55b9bcf-5jcwm                    1/1       Running   0          2h
+guestbook-bb55b9bcf-t8h9x                    1/1       Running   0          2h
+guestbook-bb55b9bcf-tnx4g                    1/1       Running   0          2h
+mongo                                        1/1       Running   0          4h
+mysql                                        1/1       Running   0          10m
+nginx-5c6cb7bc9f-4chsb                       1/1       Running   0          3h
+nginx-5c6cb7bc9f-fwfcs                       1/1       Running   0          3h
+nginx-5c6cb7bc9f-m2hvb                       1/1       Running   0          3h
+nginx-5c6cb7bc9f-vd7t2                       1/1       Running   0          3h
+redis-master-5d4c55b49d-c7ckn                1/1       Running   0          2h
+redis-slave-55d7485bf7-6z4zw                 1/1       Running   24         2h
+redis-slave-55d7485bf7-8h7z5                 1/1       Running   24         2h
+redis-slave-55d7485bf7-kk627                 1/1       Running   24         2h
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl get pods -n default
+NAME                                         READY     STATUS    RESTARTS   AGE
+busybox                                      1/1       Running   1          1h
+drone                                        1/1       Running   17         1h
+foppish-jackal-redis-master-0                1/1       Running   0          16h
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running   1          16h
+guestbook-bb55b9bcf-5jcwm                    1/1       Running   0          2h
+guestbook-bb55b9bcf-t8h9x                    1/1       Running   0          2h
+guestbook-bb55b9bcf-tnx4g                    1/1       Running   0          2h
+mongo                                        1/1       Running   0          4h
+mysql                                        1/1       Running   0          12m
+nginx-5c6cb7bc9f-4chsb                       1/1       Running   0          3h
+nginx-5c6cb7bc9f-fwfcs                       1/1       Running   0          3h
+nginx-5c6cb7bc9f-m2hvb                       1/1       Running   0          3h
+nginx-5c6cb7bc9f-vd7t2                       1/1       Running   0          3h
+redis-master-5d4c55b49d-c7ckn                1/1       Running   0          2h
+redis-slave-55d7485bf7-6z4zw                 1/1       Running   24         2h
+redis-slave-55d7485bf7-8h7z5                 1/1       Running   24         2h
+redis-slave-55d7485bf7-kk627                 1/1       Running   24         2h
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl get pods -n myns
+No resources found.
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl create -f mongo.yaml 
+pod/mongo created
+user@workstation:~/bitnami/intel-training-1$ kubectl get pods -n myns
+NAME      READY     STATUS    RESTARTS   AGE
+mongo     1/1       Running   0          6s
+user@workstation:~/bitnami/intel-training-1$ 
+```
