@@ -528,6 +528,33 @@ spec:
   storageClass: gce-pd
 ```
 
+## StorageClass
+
+```
+user@workstation:~/bitnami/intel-training-1$ minikube addons list
+- addon-manager: enabled
+- coredns: disabled
+- dashboard: enabled
+- default-storageclass: enabled
+- efk: disabled
+- freshpod: disabled
+- heapster: disabled
+- ingress: enabled
+- kube-dns: enabled
+- metrics-server: disabled
+- nvidia-driver-installer: disabled
+- nvidia-gpu-device-plugin: disabled
+- registry: disabled
+- registry-creds: disabled
+- storage-provisioner: enabled
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl get storageclasses
+NAME                 PROVISIONER                AGE
+standard (default)   k8s.io/minikube-hostpath   17h
+```
+
 ### MariaDB with persistence
 
 ```
@@ -550,3 +577,40 @@ show databases;
 kubectl delete pvc mariadb-data
 kubectl delete deploy mariadb
 ```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl create -f resources/mariadb-pvc.yaml
+persistentvolumeclaim/mariadb-data created
+user@workstation:~/bitnami/intel-training-1$ kubectl get pvc
+NAME                                       STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+mariadb-data                               Bound     pvc-6f46c756-b6d0-11e8-b38d-08002736b0e9   8Gi        RWO            standard       6s
+redis-data-foppish-jackal-redis-master-0   Bound     pvc-ae70e783-b63a-11e8-b38d-08002736b0e9   8Gi        RWO            standard       17h
+user@workstation:~/bitnami/intel-training-1$ kubectl create -f resources/mariadb-persitence.yaml
+deployment.extensions/mariadb created
+user@workstation:~/bitnami/intel-training-1$ 
+```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl get pods
+NAME                                         READY     STATUS              RESTARTS   AGE
+busybox                                      1/1       Running             2          2h
+drone                                        0/1       CrashLoopBackOff    25         2h
+foppish-jackal-redis-master-0                1/1       Running             0          17h
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running             1          17h
+guestbook-bb55b9bcf-5jcwm                    1/1       Running             0          3h
+guestbook-bb55b9bcf-t8h9x                    1/1       Running             0          3h
+guestbook-bb55b9bcf-tnx4g                    1/1       Running             0          3h
+mariadb-579686d5bc-wrt4w                     0/1       ContainerCreating   0          27s
+mongo                                        1/1       Running             0          5h
+mysql                                        1/1       Running             0          1h
+nginx-5c6cb7bc9f-4chsb                       1/1       Running             0          4h
+nginx-5c6cb7bc9f-fwfcs                       1/1       Running             0          4h
+nginx-5c6cb7bc9f-m2hvb                       1/1       Running             0          4h
+nginx-5c6cb7bc9f-vd7t2                       1/1       Running             0          4h
+redis-master-5d4c55b49d-c7ckn                1/1       Running             0          3h
+redis-slave-55d7485bf7-6z4zw                 1/1       Running             24         3h
+redis-slave-55d7485bf7-8h7z5                 1/1       Running             24         3h
+redis-slave-55d7485bf7-kk627                 1/1       Running             24         3h
+user@workstation:~/bitnami/intel-training-1$ 
+```
+
