@@ -223,3 +223,17 @@ nginx-r55rm                                  1/1       Running             0    
 nginx-r856s                                  0/1       ContainerCreating   0          6s
 user@workstation:~/bitnami/intel-training-1$ 
 ```
+
+```
+user@workstation:~/bitnami/intel-training-1$ kubectl delete rs nginx
+replicaset.extensions "nginx" deleted
+user@workstation:~/bitnami/intel-training-1$ kubectl get pods
+NAME                                         READY     STATUS        RESTARTS   AGE
+foppish-jackal-redis-master-0                1/1       Running       0          12h
+foppish-jackal-redis-slave-58b8f6b7f-hrm6p   1/1       Running       1          12h
+mongo                                        1/1       Running       0          31m
+nginx-b889q                                  0/1       Terminating   0          2m
+nginx-j4lf9                                  0/1       Terminating   0          4m
+nginx-pd27d                                  0/1       Terminating   0          5m
+user@workstation:~/bitnami/intel-training-1$ 
+```
