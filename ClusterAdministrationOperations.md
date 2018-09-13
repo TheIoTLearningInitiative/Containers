@@ -1,5 +1,9 @@
 # Cluster Administration Operations
 
+- bitnami.com/stack/gitorious
+- https://bitnami.com/stack/gitlab
+- https://bitnami.com/stacks
+
 ```
 #
 # Kubernetes Training
@@ -550,9 +554,16 @@ user@workstation:~/bitnami/intel-training-2$ sudo nano /etc/hosts
 192.168.99.100   wordpress.local   
 ```
 
+Go to 
 
+## Helm Repo
 
-## 
+```
+## Chart repositories
+helm repo list
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+```
 
 ```
 user@workstation:~/bitnami/intel-training-2$ helm repo list
@@ -570,3 +581,59 @@ Hang tight while we grab the latest from your chart repositories...
 Update Complete. ⎈ Happy Helming!⎈ 
 user@workstation:~/bitnami/intel-training-2$ 
 ```
+
+## Deploy WordPress modifying some settings
+
+```
+## Deploy WordPress modifying some settings
+helm install my-wordpress --set app.blogname=”This is my blog”
+
+## Install Official Stable WP and Upgrades
+helm install stable/wordpress --name my-stable-wordpress
+helm upgrade my-stable-wordpress stable/wordpress --set ingress.enabled=true --set wordpressBlogName="Kubernetes Training"
+helm upgrade my-stable-wordpress stable/wordpress --set image.tag=4.10
+helm history my-stable-wordpress
+```
+
+## Jsonnet
+
+```
+#####################
+# Jsonnet Installation
+#####################
+
+## OS X installation
+brew install jsonnet
+## Linux Installation - Compile from Source Code
+wget https://github.com/google/jsonnet/archive/v0.11.2.tar.gz
+## Follow instructions detailed at: https://github.com/google/jsonnet#makefile
+
+## Render jsonnet modification
+jsonnet resources/new-frontend.jsonnet
+jsonnet resources/new-frontend-2.jsonnet
+```
+
+```
+user@workstation:~/bitnami/intel-training-2$ wget https://github.com/google/jsonnet/archive/v0.11.2.tar.gz
+--2018-09-13 11:44:32--  https://github.com/google/jsonnet/archive/v0.11.2.tar.gz
+Resolving github.com (github.com)... 192.30.255.112, 192.30.255.113
+Connecting to github.com (github.com)|192.30.255.112|:443... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: https://codeload.github.com/google/jsonnet/tar.gz/v0.11.2 [following]
+--2018-09-13 11:44:34--  https://codeload.github.com/google/jsonnet/tar.gz/v0.11.2
+Resolving codeload.github.com (codeload.github.com)... 192.30.255.121, 192.30.255.120
+Connecting to codeload.github.com (codeload.github.com)|192.30.255.121|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [application/x-gzip]
+Saving to: ‘v0.11.2.tar.gz’
+
+```
+
+```
+
+```
+
+## Kubecfg
+
+https://github.com/anguslees/kubecfg
+
