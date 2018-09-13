@@ -178,3 +178,91 @@ user@workstation:~/bitnami/intel-training-2$ kubectl delete pvc mariadb-data
 persistentvolumeclaim "mariadb-data" deleted
 ```
 
+```
+user@workstation:~/bitnami/intel-training-2$ helm install my-wordpress/
+\Error: release giddy-mule failed: configmaps "wordpress-config" already exists
+user@workstation:~/bitnami/intel-training-2$ kubectl get cm
+NAME                          DATA      AGE
+foppish-jackal-redis-health   3         1d
+mysql                         2         19h
+user@workstation:~/bitnami/intel-training-2$ kubectl delete cm mysql
+configmap "mysql" deleted
+user@workstation:~/bitnami/intel-training-2$ 
+```
+
+```
+user@workstation:~/bitnami/intel-training-2$ helm install my-wordpress/                                                                                                                  
+Error: release independent-toucan failed: configmaps "wordpress-config" already exists
+user@workstation:~/bitnami/intel-training-2$ kubectl get cm --all-namespaces
+NAMESPACE     NAME                                    DATA      AGE
+activity      wordpress-config                        3         16m
+default       foppish-jackal-redis-health             3         1d
+kube-public   cluster-info                            2         1d
+kube-system   austere-walrus.v1                       1         26m
+kube-system   broken-dragon.v1                        1         17m
+kube-system   extension-apiserver-authentication      6         1d
+kube-system   flabby-heron.v1                         1         16m
+kube-system   foppish-jackal.v1                       1         1d
+kube-system   giddy-mule.v1                           1         1m
+kube-system   halting-pig.v1                          1         16m
+kube-system   independent-toucan.v1                   1         1m
+kube-system   ingress-controller-leader-nginx         0         19h
+kube-system   kube-proxy                              2         1d
+kube-system   kubeadm-config                          1         1d
+kube-system   kubeapps.v1                             1         1d
+kube-system   kubernetes-dashboard-settings           1         1d
+kube-system   nginx-load-balancer-conf                2         19h
+kubeapps      kubeapps-apprepository-jobs-bootstrap   1         1d
+kubeapps      kubeapps-dashboard-config               2         1d
+kubeapps      kubeapps-frontend-config                1         1d
+user@workstation:~/bitnami/intel-training-2$ kubectl delete cm wordpress-config -n activity
+configmap "wordpress-config" deleted
+user@workstation:~/bitnami/intel-training-2$ 
+```
+
+```
+user@workstation:~/bitnami/intel-training-2$ kubectl get deploy
+No resources found.
+user@workstation:~/bitnami/intel-training-2$ 
+```
+
+Finally
+
+```
+user@workstation:~/bitnami/intel-training-2$ helm install my-wordpress/                                                                                                                  
+NAME:   donating-llama
+LAST DEPLOYED: Thu Sep 13 10:44:01 2018
+NAMESPACE: default
+STATUS: DEPLOYED
+
+RESOURCES:
+==> v1beta1/Ingress
+NAME       HOSTS                   ADDRESS  PORTS  AGE
+wordpress  wordpress.activity.com  80, 443  0s
+
+==> v1/Pod(related)
+NAME                               READY  STATUS             RESTARTS  AGE
+mariadb-6686649c4d-jbdqf           0/1    Pending            0         1s
+wordpress-canary-79ffdb88d9-c4ppj  0/1    ContainerCreating  0         0s
+wordpress-557f8b95c5-gz8lz         0/1    ContainerCreating  0         0s
+wordpress-557f8b95c5-wscs8         0/1    ContainerCreating  0         0s
+
+==> v1/ConfigMap
+NAME              DATA  AGE
+wordpress-config  3     1s
+
+==> v1/PersistentVolumeClaim
+NAME          STATUS  VOLUME                                    CAPACITY  ACCESS MODES  STORAGECLASS  AGE
+mariadb-data  Bound   pvc-d6394940-b76b-11e8-b38d-08002736b0e9  8Gi       RWO           standard      1s
+
+==> v1/Service
+NAME       TYPE       CLUSTER-IP    EXTERNAL-IP  PORT(S)         AGE
+mariadb    ClusterIP  10.109.9.192  <none>       3306/TCP        1s
+wordpress  ClusterIP  10.101.31.71  <none>       80/TCP,443/TCP  1s
+
+==> v1beta1/Deployment
+NAME              DESIRED  CURRENT  UP-TO-DATE  AVAILABLE  AGE
+mariadb           1        1        1           0          1s
+wordpress-canary  1        1        1           0          1s
+wordpress         2        2        2           0          1s
+```
