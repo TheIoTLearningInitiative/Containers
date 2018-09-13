@@ -184,3 +184,33 @@ NOTES:
 
 user@workstation:~/bitnami/intel-training-1$ 
 ```
+
+```
+user@workstation:~/bitnami/intel-training-1$ helm install --name copter copter --set service.type=NodePort
+NAME:   copter
+LAST DEPLOYED: Thu Sep 13 15:26:55 2018
+NAMESPACE: default
+STATUS: DEPLOYED
+
+RESOURCES:
+==> v1/Service
+NAME    TYPE      CLUSTER-IP     EXTERNAL-IP  PORT(S)         AGE
+copter  NodePort  10.100.221.50  <none>       5763:31567/UDP  0s
+
+==> v1beta2/Deployment
+NAME    DESIRED  CURRENT  UP-TO-DATE  AVAILABLE  AGE
+copter  1        1        1           0          0s
+
+==> v1/Pod(related)
+NAME                    READY  STATUS             RESTARTS  AGE
+copter-74f8bc6fb-xt6n8  0/1    ContainerCreating  0         0s
+
+
+NOTES:
+1. Get the application URL by running these commands:
+  export NODE_PORT=$(kubectl get --namespace default -o jsonpath="{.spec.ports[0].nodePort}" services copter)
+  export NODE_IP=$(kubectl get nodes --namespace default -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+
+user@workstation:~/bitnami/intel-training-1$ 
+```
