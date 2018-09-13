@@ -698,3 +698,55 @@ NOTES:
 
     URL : http://127.0.0.1:15672
 ```
+
+## Creating Users
+
+- https://github.com/bitnami-labs/k8s-training-resources
+
+```
+user@workstation:~/bitnami$ kubectl get clusterrolebindings
+NAME                                                   AGE
+cluster-admin                                          1d
+kubeadm:kubelet-bootstrap                              1d
+kubeadm:node-autoapprove-bootstrap                     1d
+kubeadm:node-autoapprove-certificate-rotation          1d
+kubeadm:node-proxier                                   1d
+kubeapps-operator                                      1d
+minikube-rbac                                          1d
+storage-provisioner                                    1d
+system:aws-cloud-provider                              1d
+system:basic-user                                      1d
+system:controller:attachdetach-controller              1d
+system:controller:certificate-controller               1d
+system:controller:clusterrole-aggregation-controller   1d
+system:controller:cronjob-controller                   1d
+system:controller:daemon-set-controller                1d
+system:controller:deployment-controller                1d
+system:controller:disruption-controller                1d
+system:controller:endpoint-controller                  1d
+system:controller:generic-garbage-collector            1d
+system:controller:horizontal-pod-autoscaler            1d
+system:controller:job-controller                       1d
+system:controller:namespace-controller                 1d
+system:controller:node-controller                      1d
+system:controller:persistent-volume-binder             1d
+system:controller:pod-garbage-collector                1d
+system:controller:pv-protection-controller             1d
+system:controller:pvc-protection-controller            1d
+system:controller:replicaset-controller                1d
+system:controller:replication-controller               1d
+system:controller:resourcequota-controller             1d
+system:controller:route-controller                     1d
+system:controller:service-account-controller           1d
+system:controller:service-controller                   1d
+system:controller:statefulset-controller               1d
+system:controller:ttl-controller                       1d
+system:discovery                                       1d
+system:kube-controller-manager                         1d
+system:kube-dns                                        1d
+system:kube-scheduler                                  1d
+system:node                                            1d
+system:node-proxier                                    1d
+system:volume-scheduler                                1d
+user@workstation:~/bitnami$ 
+```
