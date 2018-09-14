@@ -3,6 +3,10 @@
 - [Kubernetes Setup](https://kubernetes.io/docs/setup/scratch/)
 
 
+- Components
+ - Host OS Controller
+ - Host OS Worker 01
+ - Host OS Worker 02
 - Types of Network
  - IP Physical Servers
  - NodePort
@@ -21,3 +25,5 @@
   - docker
   - cni
 - kube-proxy
+
+# Kube Cloud Controller Manager
