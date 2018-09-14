@@ -6,6 +6,9 @@
 
 - [Minikube](https://github.com/kubernetes/minikube)
 - [Kubectl](https://kubernetes.io/docs/reference/kubectl/overview/)
+- [K8S Training](https://github.com/bitnami-labs/k8s-training)
+- [K8S Training Resources](https://github.com/bitnami-labs/k8s-training-resources)
+- [Helm Charts](https://github.com/helm/charts)
 
 # Day 1
 
